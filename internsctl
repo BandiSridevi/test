@@ -1,0 +1,81 @@
+#!/bin/bash
+command_version='v0.1.0'
+helpFunction()
+{
+   echo ""
+   echo "Usage: $0 --cpu parameterA --memory parameterB"
+   echo -e "\t-a Description of what is parameterA"
+   echo -e "\t-b Description of what is parameterB"
+   exit 1 # Exit script after printing help
+}
+printVersion(){
+   echo "version of the command is :" $command_version;
+}
+if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
+then 
+    helpFunction
+fi 
+if [[ ( $1 == "--version") ]] 
+then 
+   printVersion 
+fi 
+
+if [[ ( $1 == "cpu" ) && ( $2 == "getinfo" ) ]]
+then
+    # execute lscpu command
+    lscpu
+fi
+
+if [[ ( $1 == "memory" ) && ( $2 == "getinfo") ]]
+then
+    # execute free command
+    free
+fi
+
+
+if [[ ( $1 == "user" ) ]]
+then 
+    if [[ ( $2 == "create" ) ]]
+    then 
+        #sudo useradd -m $3;
+        echo "to create use:" $3;
+    fi
+    if [[ ( $2 == "list" ) || ( $3 == "--sudo-only" ) ]] 
+    then
+        #print list of users in servers 
+        cat /etc/passwd | cut -d: -f1
+     fi
+fi
+
+if [[ ( $1 ==  "file" ) && ( $2 == "getinfo" ) ]]
+then 
+    if [[ -f $3 ]]
+    then
+        filename=$3;
+    else 
+        filename=$4;
+    fi        
+    filesize=`stat --printf="%s" $filename`
+    filepermssions=`stat --printf="%A" internsctl`
+    fileowner=`stat --printf="%U" internsctl`
+    filelastmodifed=`stat --printf="%z" internsctl`
+    if [[ ( $3 == "--size" ) || ( $3 == "-s" ) ]] 
+    then 
+        echo $filesize
+    elif [[ ( $3 == "--permissions" ) || ( $3 == "-p" ) ]]
+    then
+        echo $filepermissions
+    elif [[ ( $3 == "--owner" ) || ( $3 == "-o" ) ]]
+    then
+        echo $fileowner  
+    elif [[ ( $3 == "--last-modified" ) || ( $3 == "-m" ) ]]
+    then
+        echo $filelastmodifed
+    else
+        printf "File\t:\t$filename"
+        printf "\nAccess\t:\t$filepermssions"
+        printf "\nSize\t:\t$filesize"
+        printf "\nOwner\t:\t$fileowner"
+        printf "\nModify\t:\t$filelastmodifed\n"
+    fi 
+fi
